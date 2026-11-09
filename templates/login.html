@@ -1,0 +1,19 @@
+{% extends "base_auth.html" %}
+{% block judul %}Masuk{% endblock %}
+{% block isi %}
+<h2>Masuk</h2>
+<p class="mut">Masuk untuk melihat dan mengelola tiket kamu.</p>
+<div class="card">
+  <form method="post" autocomplete="on">
+    <label for="hp">Nomor HP</label>
+    <input id="hp" name="hp" value="{{ hp }}" inputmode="tel" autocomplete="username" placeholder="08xxxxxxxxxx" required autofocus>
+    <label for="password">Kata sandi</label>
+    <div class="pw">
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <button type="button">Lihat</button>
+    </div>
+    <button class="btn blok" type="submit">Masuk</button>
+  </form>
+</div>
+<p class="alt-link mut">Belum punya akun? <a href="{{ url_for('daftar', next=request.args.get('next')) }}">Daftar sekarang</a></p>
+{% endblock %}

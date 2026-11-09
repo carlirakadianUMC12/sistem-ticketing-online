@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Tiket {{ p['kode'] }}{% endblock %}
+{% block content %}
+<h2>{{ 'Pembayaran berhasil' if p['status'] == 'Aktif' else 'E-Tiket' }}</h2>
+<div class="tiket">
+  <b>E-Tiket Curug Cipeteuy</b>
+  <div><div id="qr" data-kode="{{ p['kode'] }}"></div></div>
+  <div><b>{{ p['kode'] }}</b></div>
+  <div class="mut">{{ p['tanggal_kunjungan'] }}<br>{{ p['nama'] }} · {{ p['dewasa'] + p['anak'] }} orang</div>
+  <p><span class="tag {{ 'ok' if p['status']=='Aktif' else 'wait' if p['status']=='Terpakai' else 'bad' }}">{{ p['status'] }}</span></p>
+</div>
+<div class="card">
+  <div class="row"><span>Pemesan</span><b>{{ p['nama'] }} ({{ p['hp'] }})</b></div>
+  <div class="row"><span>Tiket</span><b>{{ p['dewasa'] }} dewasa, {{ p['anak'] }} anak</b></div>
+  {% if p['tambahan'] %}<div class="row"><span>Tambahan</span><b>{{ p['tambahan'] }}</b></div>{% endif %}
+  <div class="row"><span>Total</span><b>{{ rp(p['total']) }} ({{ p['metode'] }})</b></div>
+  <div class="row"><span>Dipesan</span><b>{{ p['dibuat_pada'] }}</b></div>
+</div>
+<p class="noprint">
+  <button class="btn" type="button" onclick="window.print()">Cetak tiket</button>
+  <a class="btn alt" href="{{ url_for('akun') if user else url_for('cari') }}">Tiket saya</a>
+</p>
+<p class="mut noprint">Simpan kode di atas atau tangkap layar halaman ini. Tunjukkan QR ke petugas gerbang.</p>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+var el = document.getElementById('qr');
+if (window.QRCode) { new QRCode(el, {text: el.dataset.kode, width: 170, height: 170}); }
+else { el.textContent = el.dataset.kode; }
+</script>
+{% endblock %}

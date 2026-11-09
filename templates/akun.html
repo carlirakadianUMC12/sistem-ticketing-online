@@ -1,0 +1,32 @@
+{% extends "base_auth.html" %}
+{% block judul %}Akun saya{% endblock %}
+{% block kelas %}lebar{% endblock %}
+{% block isi %}
+<h2>Halo, {{ u.nama }}</h2>
+<p class="mut">{{ u.hp }}</p>
+<p>
+  <a class="btn" href="{{ url_for('pesan') }}">Pesan tiket</a>
+  <a class="btn alt" href="{{ url_for('logout') }}">Keluar</a>
+</p>
+
+<h3>Tiket saya</h3>
+{% for p in data %}
+<div class="card">
+  <div class="row">
+    <a href="{{ url_for('tiket', kode=p['kode']) }}"><b>{{ p['kode'] }}</b></a>
+    <span class="tag {{ 'ok' if p['status']=='Aktif' else 'wait' if p['status']=='Terpakai' else 'bad' }}">{{ p['status'] }}</span>
+  </div>
+  <div class="mut">{{ p['tanggal_kunjungan'] }} · {{ p['dewasa'] + p['anak'] }} orang · {{ rp(p['total']) }}</div>
+  {% if p['status'] == 'Aktif' %}
+  <form method="post" action="{{ url_for('batal') }}" style="margin-top:10px" data-kode="{{ p['kode'] }}"
+        onsubmit="return confirm('Batalkan tiket ' + this.dataset.kode + '?')">
+    <input type="hidden" name="kode" value="{{ p['kode'] }}">
+    <input type="hidden" name="hp" value="{{ p['hp'] }}">
+    <button class="btn alt" type="submit">Batalkan pesanan</button>
+  </form>
+  {% endif %}
+</div>
+{% else %}
+<div class="card">Belum ada tiket. <a href="{{ url_for('pesan') }}">Pesan tiket pertama kamu.</a></div>
+{% endfor %}
+{% endblock %}

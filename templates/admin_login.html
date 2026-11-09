@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Login Admin{% endblock %}
+{% block content %}
+<h2>Login admin</h2>
+<div class="card" style="max-width:380px">
+  <form method="post">
+    <label for="pin">PIN admin</label>
+    <input id="pin" name="pin" type="password" inputmode="numeric" autocomplete="current-password" required autofocus>
+    <div style="margin-top:12px"><button class="btn" type="submit">Masuk</button></div>
+  </form>
+</div>
+{% endblock %}

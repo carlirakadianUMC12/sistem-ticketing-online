@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Beranda{% endblock %}
+{% block content %}
+<section class="hero">
+  <h2>Air terjun Cipeteuy, tiket dalam satu layar.</h2>
+  <p>Pilih tanggal, bayar, lalu tunjukkan kode QR di gerbang. Tidak perlu antre loket.</p>
+  <a class="btn" href="{{ url_for('pesan') }}">Pesan tiket sekarang</a>
+</section>
+<div class="grid">
+  <div class="card"><h3>Jam buka</h3><div class="mut">Setiap hari 07.00–17.00 WIB. Tutup saat cuaca ekstrem.</div></div>
+  <div class="card"><h3>Lokasi</h3><div class="mut">Kabupaten Majalengka, Jawa Barat.</div></div>
+  <div class="card"><h3>Fasilitas</h3><div class="mut">Parkir, warung, toilet, mushola, dan pemandu lokal.</div></div>
+</div>
+<div class="card">
+  <h3>Tarif</h3>
+  {% for k, v in tarif.items() %}
+    <div class="row"><span>{{ v[0] }}</span><span>{{ rp(v[1]) }} hari biasa · {{ rp(v[2]) }} akhir pekan</span></div>
+  {% endfor %}
+  {% for k, v in tambahan.items() %}
+    <div class="row"><span>{{ v[0] }}</span><span>{{ rp(v[1]) }}</span></div>
+  {% endfor %}
+</div>
+<div class="card"><h3>Aturan berkunjung</h3>
+  <div class="mut">Jaga kebersihan, jangan berenang saat debit air besar, ikuti arahan petugas, dan bawa tiket digital.</div></div>
+{% endblock %}

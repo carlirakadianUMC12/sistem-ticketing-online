@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{% block title %}Beranda{% endblock %} · Curug Cipeteuy</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF3EF;--surf:#fff;--ink:#16261F;--mut:#5B6B63;--pri:#1E5C45;--pri-ink:#fff;--acc:#2A7FA3;--line:#CFDAD3;--warn:#B3441F;--ok:#1E7A4A;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root{--bg:#0F1A15;--surf:#17261F;--ink:#E6EFE9;--mut:#9DB0A5;--pri:#4DB88A;--pri-ink:#0B1712;--acc:#6CB8D8;--line:#2B3F35;--warn:#F08A63;--ok:#5AD08F}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.5}
+header{background:var(--pri);color:var(--pri-ink);padding:14px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+header h1{margin:0;font-size:1.15rem;font-weight:800}
+header h1 a{color:inherit;text-decoration:none}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+nav a{color:inherit;text-decoration:none;border:1px solid currentColor;border-radius:99px;padding:6px 14px;opacity:.85}
+nav a.on{background:var(--pri-ink);color:var(--pri);opacity:1;font-weight:600}
+main{max-width:860px;margin:0 auto;padding:18px 14px 60px}
+.hero{padding:34px 0 18px}.hero h2{font-size:clamp(2rem,7vw,3.4rem);line-height:1.05;margin:0 0 10px;font-weight:800}
+.hero p{max-width:56ch;color:var(--mut);margin:0 0 18px}
+h2{font-size:1.6rem;margin:10px 0}
+h3{margin:0 0 8px;font-size:1.05rem}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:10px;padding:16px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+label{display:block;font-size:.9rem;color:var(--mut);margin:10px 0 4px}
+input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+.btn{display:inline-block;background:var(--pri);color:var(--pri-ink);border:0;border-radius:8px;padding:11px 18px;font:inherit;font-weight:600;cursor:pointer;text-decoration:none}
+.btn.alt{background:transparent;color:var(--pri);border:1px solid var(--pri)}
+a{color:var(--acc)}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.row:last-child{border:0}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:1.1rem;cursor:pointer}
+.qty input{width:52px;text-align:center;padding:6px}
+.mut{color:var(--mut);font-size:.9rem}
+.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.8rem;font-weight:600;border:1px solid currentColor}
+.ok{color:var(--ok)}.bad{color:var(--warn)}.wait{color:var(--acc)}
+.msg{padding:10px 12px;border-radius:8px;margin:12px 0;border:1px solid currentColor;font-weight:600}
+.msg.error{color:var(--warn)}.msg.ok{color:var(--ok)}
+.tiket{text-align:center;border:2px dashed var(--pri);border-radius:12px;padding:18px;background:var(--surf)}
+#qr{display:inline-block;background:#fff;padding:10px;border-radius:8px;margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+.scroll{overflow-x:auto}
+.stat{font-size:1.9rem;font-weight:800}
+.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
+footer{text-align:center;color:var(--mut);font-size:.8rem;padding:20px}
+@media print{header,footer,.noprint{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1><a href="{{ url_for('index') }}">Curug Cipeteuy · Tiket Online</a></h1>
+  {% set ep = request.endpoint %}
+  <nav aria-label="Menu utama">
+    <a href="{{ url_for('index') }}" class="{{ 'on' if ep=='index' }}">Beranda</a>
+    <a href="{{ url_for('pesan') }}" class="{{ 'on' if ep=='pesan' }}">Pesan Tiket</a>
+    {% if user %}
+      <a href="{{ url_for('akun') }}" class="{{ 'on' if ep in ('akun','cari') }}">Tiket Saya</a>
+    {% else %}
+      <a href="{{ url_for('cari') }}" class="{{ 'on' if ep=='cari' }}">Tiket Saya</a>
+    {% endif %}
+    <a href="{{ url_for('scan') }}" class="{{ 'on' if ep=='scan' }}">Scanner</a>
+    <a href="{{ url_for('admin') }}" class="{{ 'on' if ep and ep.startswith('admin') }}">Admin</a>
+    {% if user %}
+      <a href="{{ url_for('akun') }}">{{ user.nama }}</a>
+      <a href="{{ url_for('logout') }}">Keluar</a>
+    {% else %}
+      <a href="{{ url_for('login') }}" class="{{ 'on' if ep in ('login','daftar') }}">Masuk</a>
+    {% endif %}
+  </nav>
+</header>
+<main>
+  {% for kat, isi in get_flashed_messages(with_categories=true) %}
+    <div class="msg {{ kat }}" role="alert">{{ isi }}</div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+</main>
+<footer>Prototype untuk demo tugas kuliah. Tarif, kuota, dan pembayaran adalah data simulasi.</footer>
+{% block scripts %}{% endblock %}
+</body>
+</html>

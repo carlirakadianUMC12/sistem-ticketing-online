@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Scanner Petugas{% endblock %}
+{% block content %}
+<h2>Scanner petugas gerbang</h2>
+<div class="card">
+  <p class="mut">Ketik atau tempel kode tiket (di aplikasi nyata, kamera membaca QR).</p>
+  <form method="post">
+    <label for="kode">Kode tiket</label>
+    <input id="kode" name="kode" placeholder="CPT-XXXXXX" style="text-transform:uppercase" autocomplete="off" required autofocus>
+    <div style="margin-top:12px"><button class="btn" type="submit">Validasi tiket</button></div>
+  </form>
+  {% if hasil %}
+    <div class="msg {{ 'ok' if hasil.ok else 'error' }}" role="alert">{{ hasil.pesan }}</div>
+  {% endif %}
+</div>
+{% endblock %}

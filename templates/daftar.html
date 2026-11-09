@@ -1,0 +1,23 @@
+{% extends "base_auth.html" %}
+{% block judul %}Daftar{% endblock %}
+{% block isi %}
+<h2>Buat akun</h2>
+<p class="mut">Cukup nomor HP dan kata sandi. Tiket yang kamu pesan akan tersimpan di akun.</p>
+<div class="card">
+  <form method="post">
+    <label for="nama">Nama lengkap</label>
+    <input id="nama" name="nama" value="{{ form.get('nama','') }}" autocomplete="name" required autofocus>
+    <label for="hp">Nomor HP</label>
+    <input id="hp" name="hp" value="{{ form.get('hp','') }}" inputmode="tel" autocomplete="username" placeholder="08xxxxxxxxxx" required>
+    <label for="password">Kata sandi (minimal 6 karakter)</label>
+    <div class="pw">
+      <input id="password" name="password" type="password" autocomplete="new-password" minlength="6" required>
+      <button type="button">Lihat</button>
+    </div>
+    <label for="ulang">Ulangi kata sandi</label>
+    <input id="ulang" name="ulang" type="password" autocomplete="new-password" minlength="6" required>
+    <button class="btn blok" type="submit">Daftar</button>
+  </form>
+</div>
+<p class="alt-link mut">Sudah punya akun? <a href="{{ url_for('login', next=request.args.get('next')) }}">Masuk</a></p>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Pesan Tiket{% endblock %}
+{% block content %}
+<h2>Pesan tiket</h2>
+<form method="post" id="fpesan">
+  <div class="card">
+    <label for="tanggal">Tanggal kunjungan</label>
+    <input id="tanggal" name="tanggal" type="date" min="{{ hari_ini }}" value="{{ form.get('tanggal') or hari_ini }}" required>
+    <div class="mut" id="info" style="margin-top:6px"></div>
+  </div>
+
+  <div class="card">
+    <h3>Tiket masuk</h3>
+    {% for k, v in tarif.items() %}
+    <div class="row">
+      <div>{{ v[0] }}<div class="mut" data-harga="{{ k }}"></div></div>
+      <div class="qty">
+        <button type="button" data-min="{{ k }}" aria-label="Kurangi {{ v[0] }}">−</button>
+        <input type="number" name="{{ k }}" id="q-{{ k }}" min="0" max="50" value="{{ form.get(k) or (1 if k=='dewasa' else 0) }}" aria-label="Jumlah {{ v[0] }}">
+        <button type="button" data-plus="{{ k }}" aria-label="Tambah {{ v[0] }}">+</button>
+      </div>
+    </div>
+    {% endfor %}
+    <h3 style="margin-top:14px">Tambahan</h3>
+    {% for k, v in tambahan.items() %}
+    <div class="row">
+      <div>{{ v[0] }}<div class="mut">{{ rp(v[1]) }}</div></div>
+      <div class="qty">
+        <button type="button" data-min="{{ k }}" aria-label="Kurangi {{ v[0] }}">−</button>
+        <input type="number" name="{{ k }}" id="q-{{ k }}" min="0" max="10" value="{{ form.get(k) or 0 }}" aria-label="Jumlah {{ v[0] }}">
+        <button type="button" data-plus="{{ k }}" aria-label="Tambah {{ v[0] }}">+</button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <h3>Data pemesan</h3>
+    <label for="nama">Nama lengkap</label>
+    <input id="nama" name="nama" value="{{ form.get('nama','') }}" autocomplete="name" required>
+    <label for="hp">Nomor WhatsApp</label>
+    <input id="hp" name="hp" value="{{ form.get('hp','') }}" inputmode="tel" placeholder="08xxxxxxxxxx" required>
+    <label for="metode">Metode pembayaran (simulasi)</label>
+    <select id="metode" name="metode">
+      {% for m in metode %}<option {{ 'selected' if form.get('metode')==m }}>{{ m }}</option>{% endfor %}
+    </select>
+  </div>
+
+  <div class="card row"><b>Total</b><b class="stat" style="font-size:1.4rem" id="total">Rp0</b></div>
+  {% if not user %}<p class="mut"><a href="{{ url_for('login', next=url_for('pesan')) }}">Masuk</a> supaya data pemesan terisi otomatis dan tiket tersimpan di akun.</p>{% endif %}
+  <button class="btn" type="submit">Bayar sekarang</button>
+  <p class="mut">Ini simulasi. Tidak ada uang sungguhan yang diproses.</p>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+var TARIF = {{ tarif|tojson }};
+var TAMBAHAN = {{ tambahan|tojson }};
+var weekend = false;
+function rp(n){return 'Rp' + n.toLocaleString('id-ID');}
+function qty(k){return Math.max(0, parseInt(document.getElementById('q-'+k).value, 10) || 0);}
+function hitung(){
+  var i = weekend ? 2 : 1, t = 0, k;
+  for (k in TARIF){ t += qty(k) * TARIF[k][i]; document.querySelector('[data-harga="'+k+'"]').textContent = rp(TARIF[k][i]); }
+  for (k in TAMBAHAN){ t += qty(k) * TAMBAHAN[k][1]; }
+  document.getElementById('total').textContent = rp(t);
+}
+function cekKuota(){
+  var tgl = document.getElementById('tanggal').value, info = document.getElementById('info');
+  if (!tgl){ info.textContent = ''; return; }
+  fetch('/api/kuota?tanggal=' + encodeURIComponent(tgl)).then(function(r){return r.json();}).then(function(d){
+    if (!d.ok){ info.textContent = ''; return; }
+    weekend = d.akhir_pekan;
+    info.textContent = (d.akhir_pekan ? 'Tarif akhir pekan. ' : 'Tarif hari biasa. ') +
+      (d.tutup ? 'Objek wisata ditutup pada tanggal ini.' : 'Sisa kuota: ' + d.sisa);
+    hitung();
+  }).catch(function(){});
+}
+document.querySelectorAll('[data-plus]').forEach(function(b){
+  b.addEventListener('click', function(){
+    var i = document.getElementById('q-'+b.dataset.plus);
+    i.value = Math.min(+i.max, qty(b.dataset.plus) + 1); hitung();
+  });
+});
+document.querySelectorAll('[data-min]').forEach(function(b){
+  b.addEventListener('click', function(){
+    var i = document.getElementById('q-'+b.dataset.min);
+    i.value = Math.max(0, qty(b.dataset.min) - 1); hitung();
+  });
+});
+document.querySelectorAll('input[type=number]').forEach(function(i){ i.addEventListener('input', hitung); });
+document.getElementById('tanggal').addEventListener('change', cekKuota);
+hitung(); cekKuota();
+</script>
+{% endblock %}

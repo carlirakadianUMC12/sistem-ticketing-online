@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Admin{% endblock %}
+{% block content %}
+<h2>Dashboard admin</h2>
+<div class="grid">
+  <div class="card"><div class="mut">Pendapatan</div><div class="stat">{{ rp(r.pendapatan) }}</div></div>
+  <div class="card"><div class="mut">Tiket terjual</div><div class="stat">{{ r.terjual }}</div></div>
+  <div class="card"><div class="mut">Pengunjung sudah masuk</div><div class="stat">{{ r.masuk }}</div></div>
+  <div class="card"><div class="mut">Jumlah pesanan</div><div class="stat">{{ r.jumlah_pesanan }}</div></div>
+</div>
+
+<div class="card">
+  {% set pct = [ (terjual_hari_ini / kuota * 100) | round | int, 100 ] | min %}
+  <h3>Kuota hari ini ({{ terjual_hari_ini }} / {{ kuota }})</h3>
+  <div class="bar" role="progressbar" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100"><i style="width:{{ pct }}%"></i></div>
+  <form method="post" action="{{ url_for('admin_kuota') }}">
+    <label for="kuota">Kuota harian</label>
+    <div style="display:flex;gap:8px">
+      <input id="kuota" name="kuota" type="number" min="10" value="{{ kuota }}">
+      <button class="btn" type="submit">Simpan</button>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Tutup / buka tanggal</h3>
+  <form method="post" action="{{ url_for('admin_tutup') }}">
+    <label for="tanggal">Tanggal (cuaca buruk, perawatan)</label>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input id="tanggal" name="tanggal" type="date" min="{{ hari_ini }}" required style="flex:1;min-width:160px">
+      <button class="btn" type="submit" name="aksi" value="tutup">Tutup</button>
+      <button class="btn alt" type="submit" name="aksi" value="buka">Buka</button>
+    </div>
+  </form>
+  <p class="mut">{% if tutup %}Ditutup: {{ tutup | join(', ') }}{% else %}Tidak ada tanggal yang ditutup.{% endif %}</p>
+</div>
+
+<div class="card">
+  <h3>Daftar pesanan</h3>
+  <div class="scroll">
+    <table>
+      <tr><th>Kode</th><th>Tanggal</th><th>Pemesan</th><th>Jml</th><th>Total</th><th>Status</th></tr>
+      {% for p in pesanan %}
+      <tr>
+        <td><a href="{{ url_for('tiket', kode=p['kode']) }}">{{ p['kode'] }}</a></td>
+        <td>{{ p['tanggal_kunjungan'] }}</td><td>{{ p['nama'] }}</td>
+        <td>{{ p['dewasa'] + p['anak'] }}</td><td>{{ rp(p['total']) }}</td><td>{{ p['status'] }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="mut">Belum ada pesanan.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+  <p><a class="btn alt" href="{{ url_for('admin_csv') }}">Unduh CSV</a>
+     <a class="btn alt" href="{{ url_for('admin_logout') }}">Keluar admin</a></p>
+</div>
+{% endblock %}
